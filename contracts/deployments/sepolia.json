@@ -1,0 +1,10 @@
+{
+  "network": {
+    "name": "sepolia",
+    "chainId": "11155111"
+  },
+  "deployer": "0x7233Db9c06D301a8C12f1738aAF722bBB32a0A5E",
+  "familyAccount": "0xD53116e56224d0Dc04e6B11cC8bE7Ce3143648F1",
+  "timestamp": "2025-10-24T17:55:24.941Z",
+  "blockNumber": 9481721
+}

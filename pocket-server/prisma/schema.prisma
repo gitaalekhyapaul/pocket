@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  owner       String   // wallet address
+  contract    String   // FamilyAccount contract address
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  members     Member[]
+  transactions Transaction[]
+  spendRequests SpendRequest[]
+  
+  @@map("families")
+}
+
+model Member {
+  id            String   @id @default(cuid())
+  familyId      String
+  walletAddress String   @unique
+  name          String
+  role          String   // "parent", "child", "guardian"
+  dailyLimit    String   // in wei
+  requiresApproval Boolean @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  spendRequests SpendRequest[]
+  
+  @@map("members")
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  familyId      String
+  memberId      String
+  txHash        String   @unique
+  tokenAddress  String
+  toAddress     String
+  amount        String   // in wei
+  description   String?
+  status        String   // "pending", "completed", "failed"
+  blockNumber   Int?
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member        Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("transactions")
+}
+
+model SpendRequest {
+  id            String   @id @default(cuid())
+  familyId      String
+  memberId      String
+  requestId     String   @unique // on-chain request ID
+  tokenAddress  String
+  toAddress     String
+  amount        String   // in wei
+  description   String?
+  status        String   // "pending", "approved", "rejected"
+  txHash        String?  // transaction hash after approval
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member        Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("spend_requests")
+}
+
+model Token {
+  id            String   @id @default(cuid())
+  address       String   @unique
+  symbol        String
+  name          String
+  decimals      Int
+  chainId       Int
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  
+  @@map("tokens")
+}

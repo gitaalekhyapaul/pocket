@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./pocket-server
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./prod.db
+      - PORT=4000
+      - RPC_URL=${RPC_URL}
+      - OWNER_PRIVATE_KEY=${OWNER_PRIVATE_KEY}
+      - FAMILY_ACCOUNT_ADDRESS=${FAMILY_ACCOUNT_ADDRESS}
+    volumes:
+      - backend_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
+  frontend:
+    build:
+      context: ./pocket-client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+      - NEXT_PUBLIC_CHAIN_ID=${NEXT_PUBLIC_CHAIN_ID}
+      - NEXT_PUBLIC_FAMILY_ACCOUNT_ADDRESS=${FAMILY_ACCOUNT_ADDRESS}
+      - NEXT_PUBLIC_PYUSD_ADDRESS=${NEXT_PUBLIC_PYUSD_ADDRESS}
+      - NEXT_PUBLIC_USDC_ADDRESS=${NEXT_PUBLIC_USDC_ADDRESS}
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  backend_data:

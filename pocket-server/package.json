@@ -1,12 +1,14 @@
 {
   "name": "pocket-server",
   "version": "1.0.0",
-  "description": "Server for Pocket",
+  "description": "Server for Pocket - Family Delegated Payments",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -26,9 +28,13 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@prisma/client": "^5.18.0",
     "axios": "^1.12.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "ethers": "^6.13.1",
+    "express": "^5.1.0",
+    "prisma": "^5.18.0",
+    "socket.io": "^4.8.1"
   }
 }
